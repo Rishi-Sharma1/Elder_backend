@@ -1,6 +1,6 @@
+import "dotenv/config";
 import express from "express";
 import cors from "cors";
-import dotenv from "dotenv";
 import connectDB from "./src/config/db.js";
 import volunteerRoutes from "./src/routes/volunteerRoutes.js";
 import authRoutes from "./src/routes/authRoutes.js";
@@ -10,7 +10,6 @@ import adminRoutes from "./src/routes/adminRoutes.js";
 import profileRoutes from "./src/routes/profileRoutes.js";
 
 
-dotenv.config();
 connectDB();
 
 const app = express();
@@ -24,6 +23,7 @@ app.use("/ngo", ngoRoutes);
 app.use("/admin", adminRoutes);
 app.use("/profile", profileRoutes);
 
+console.log("ENV:", process.env.FIREBASE_SERVICE_ACCOUNT ? "FOUND" : "MISSING");
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
