@@ -1,12 +1,15 @@
-import admin from "firebase-admin"
-import { readFileSync } from "fs"
+import admin from "firebase-admin";
 
-const serviceAccount = JSON.parse(
-  readFileSync("./serviceAccountKey.json", "utf8")
-)
+let serviceAccount;
+
+if (!process.env.FIREBASE_SERVICE_ACCOUNT) {
+  throw new Error("FIREBASE_SERVICE_ACCOUNT is not set");
+}
+
+serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
 
 admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount)
-})
+  credential: admin.credential.cert(serviceAccount),
+});
 
-export default admin
+export default admin;
