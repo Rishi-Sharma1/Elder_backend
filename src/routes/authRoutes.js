@@ -6,67 +6,14 @@ import verifyUser from "../middleware/verifyUser.js";
 const router = express.Router();
 console.log("AUTH ROUTES LOADED");
 
-// REGISTER
-// router.post("/register", async (req, res) => {
-//   try {
-//     const { token, role } = req.body;
 
-//     if (!token || !role) {
-//       return res.status(400).json({ message: "Token and role are required" });
-//     }
 
-//     const decoded = await admin.auth().verifyIdToken(token);
 
-//     let user = await User.findOne({ uid: decoded.uid });
+app.get("/", (req, res) => {
+  res.send("Elder Backend is Running 🚀");
+});
 
-//     if (!user) {
-//       user = await User.create({
-//         uid: decoded.uid,
-//         email: decoded.email,
-//         role,
-//         profileCompleted: false,
-//         approved: role === "ngo" ? false : true,
-//       });
-//     }
 
-//     res.status(200).json(user);
-//   } catch (error) {
-//     console.error("REGISTER ERROR:", error.message);
-//     res.status(500).json({ message: "Register failed", error: error.message });
-//   }
-// });
-
-// router.post("/register", async (req, res) => {
-//   try {
-//     const { token, role } = req.body;
-
-//     if (!token || !role) {
-//       return res.status(400).json({ message: "Token and role required" });
-//     }
-
-//     const decoded = await admin.auth().verifyIdToken(token);
-
-//     let user = await User.findOne({ uid: decoded.uid });
-
-//     if (!user) {
-//       user = await User.create({
-//         uid: decoded.uid,
-//         email: decoded.email,
-//         role,
-//         profileCompleted: false,
-//         approved: role === "ngo" ? false : true,
-//       });
-//     }
-
-//     return res.status(200).json(user);
-//   } catch (error) {
-//     console.error("REGISTER ERROR:", error);
-//     return res.status(500).json({
-//       message: "Register failed",
-//       error: error.message,
-//     });
-//   }
-// });
 
 router.post("/register", async (req, res) => {
   try {
