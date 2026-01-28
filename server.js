@@ -15,7 +15,13 @@ connectDB();
 const app = express();
 app.use(cors());
 app.use(express.json());
-
+app.get("/", (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: "ElderConnect Backend is Running 🚀",
+    version: "1.0.0"
+  });
+});
 app.use("/auth", authRoutes);
 app.use("/elder", elderRoutes);
 app.use("/volunteer", volunteerRoutes);
@@ -25,9 +31,6 @@ app.use("/profile", profileRoutes);
 
 console.log("ENV:", process.env.FIREBASE_SERVICE_ACCOUNT ? "FOUND" : "MISSING");
 
-app.get("/", (req, res) => {
-  res.send("Elder Backend is Running 🚀");
-});
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

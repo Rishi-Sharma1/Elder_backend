@@ -9,9 +9,7 @@ console.log("AUTH ROUTES LOADED");
 
 
 
-app.get("/", (req, res) => {
-  res.send("Elder Backend is Running 🚀");
-});
+
 
 
 
