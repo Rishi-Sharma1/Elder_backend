@@ -25,5 +25,9 @@ app.use("/profile", profileRoutes);
 
 console.log("ENV:", process.env.FIREBASE_SERVICE_ACCOUNT ? "FOUND" : "MISSING");
 
+app.get("/", (req, res) => {
+  res.send("Elder Backend is Running 🚀");
+});
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
