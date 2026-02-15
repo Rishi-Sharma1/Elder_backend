@@ -86,6 +86,26 @@ router.post(
   }
 );
 
+router.get(
+  "/completed",
+  verifyUser,
+  requireRole("ngo"),
+  async (req, res) => {
+    try {
+      const completedRequests = await Request.find({
+        status: "completed",
+      })
+        .populate("elder", "name email")
+        .populate("volunteer", "name email")
+        .sort({ updatedAt: -1 });
+
+      res.json(completedRequests);
+    } catch (err) {
+      console.error("COMPLETED FETCH ERROR:", err);
+      res.status(500).json({ message: "Failed to fetch completed requests" });
+    }
+  }
+);
 
 
 export default router;

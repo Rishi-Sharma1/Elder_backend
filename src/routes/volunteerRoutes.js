@@ -87,4 +87,25 @@ router.post(
   }
 );
 
+router.get(
+  "/completed",
+  verifyUser,
+  requireRole("volunteer"),
+  async (req, res) => {
+    try {
+      const completedTasks = await Request.find({
+        volunteer: req.user._id,
+        status: "completed",
+      })
+        .populate("elder", "name email")
+        .sort({ updatedAt: -1 });
+
+      res.json(completedTasks);
+    } catch (err) {
+      res.status(500).json({ message: "Failed to fetch history" });
+    }
+  }
+);
+
+
 export default router;
