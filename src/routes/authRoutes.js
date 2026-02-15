@@ -4,14 +4,6 @@ import User from "../models/User.js";
 import verifyUser from "../middleware/verifyUser.js";
 
 const router = express.Router();
-console.log("AUTH ROUTES LOADED");
-
-
-
-
-
-
-
 
 router.post("/register", async (req, res) => {
   try {
