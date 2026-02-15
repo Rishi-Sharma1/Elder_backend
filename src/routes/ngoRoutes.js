@@ -12,13 +12,30 @@ router.get(
   verifyUser,
   requireRole("ngo"),
   async (req, res) => {
-    const elders = await User.countDocuments({ role: "elder" });
-    const volunteers = await User.countDocuments({ role: "volunteer" });
-    const requests = await Request.countDocuments();
+    try {
+      const volunteers = await User.countDocuments({
+        role: "volunteer",
+      });
 
-    res.json({ elders, volunteers, requests });
+      const openRequests = await Request.countDocuments({
+        status: "pending",
+      });
+
+      const completedTasks = await Request.countDocuments({
+        status: "completed",
+      });
+
+      res.json({
+        volunteers,
+        openRequests,
+        completedTasks,
+      });
+    } catch (err) {
+      res.status(500).json({ message: "Stats fetch failed" });
+    }
   }
 );
+
 
 // GET ALL REQUESTS
 router.get(
@@ -97,7 +114,8 @@ router.get(
       })
         .populate("elder", "name email")
         .populate("volunteer", "name email")
-        .sort({ updatedAt: -1 });
+        .sort({ updatedAt: -1 }) // latest completed first
+        .limit(5); // only latest 5
 
       res.json(completedRequests);
     } catch (err) {
@@ -106,6 +124,7 @@ router.get(
     }
   }
 );
+
 
 
 export default router;
