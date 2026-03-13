@@ -1,9 +1,106 @@
 import express from "express";
 import User from "../models/User.js";
+import Request from "../models/Request.js";
 import verifyUser from "../middleware/verifyUser.js";
 import requireRole from "../middleware/requireRole.js";
 
 const router = express.Router();
+
+// DASHBOARD STATS (aggregated for admin dashboard)
+router.get(
+  "/dashboard-stats",
+  verifyUser,
+  requireRole("admin"),
+  async (req, res) => {
+    try {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      // Run all queries in parallel for performance
+      const [
+        totalUsers,
+        activeNGOs,
+        dailyActivities,
+        reportsPending,
+        usersByRole,
+        requestsByType,
+        requestsByStatus,
+        recentUsers,
+        pendingNGOs,
+        flaggedReports,
+        recentRequests,
+        totalRequests,
+      ] = await Promise.all([
+        // Stat cards
+        User.countDocuments(),
+        User.countDocuments({ role: "ngo", approved: true }),
+        Request.countDocuments({ createdAt: { $gte: today } }),
+        User.countDocuments({ "verification.status": "pending" }),
+
+        // Activity charts - users by role
+        User.aggregate([
+          { $group: { _id: "$role", count: { $sum: 1 } } },
+        ]),
+
+        // Activity charts - requests by type
+        Request.aggregate([
+          { $group: { _id: "$type", count: { $sum: 1 } } },
+        ]),
+
+        // Requests by status
+        Request.aggregate([
+          { $group: { _id: "$status", count: { $sum: 1 } } },
+        ]),
+
+        // Recent users
+        User.find()
+          .sort({ createdAt: -1 })
+          .limit(8)
+          .select("name email role approved createdAt verification"),
+
+        // Pending NGO approvals
+        User.find({ role: "ngo", approved: false }).select(
+          "name email createdAt"
+        ),
+
+        // Flagged reports (pending verifications)
+        User.find({ "verification.status": "pending" }).select(
+          "name email role verification createdAt"
+        ),
+
+        // Recent requests
+        Request.find()
+          .sort({ createdAt: -1 })
+          .limit(10)
+          .populate("elder", "name")
+          .populate("volunteer", "name"),
+
+        // Total requests ever
+        Request.countDocuments(),
+      ]);
+
+      res.json({
+        stats: {
+          totalUsers,
+          activeNGOs,
+          dailyActivities,
+          reportsPending,
+          totalRequests,
+        },
+        usersByRole,
+        requestsByType,
+        requestsByStatus,
+        recentUsers,
+        pendingNGOs,
+        flaggedReports,
+        recentRequests,
+      });
+    } catch (err) {
+      console.error("DASHBOARD STATS ERROR:", err);
+      res.status(500).json({ message: "Failed to fetch dashboard stats" });
+    }
+  }
+);
 
 // GET ALL USERS
 router.get(
